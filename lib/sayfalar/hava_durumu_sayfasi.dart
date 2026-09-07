@@ -27,16 +27,33 @@ class _HavaDurumuSayfasiState extends State<HavaDurumuSayfasi> {
   @override
   void initState() {
     super.initState();
-    _fetchWeather('Istanbul');
+    _fetchWeatherByLocation();
   }
 
-  // API'den veri çeken fonksiyon
   Future<void> _fetchWeather(String city) async {
     final data = await _weatherService.fetchCurrentWeather(city);
     setState(() {
       _weatherData = data;
       _isLoading = false;
     });
+  }
+
+  Future<void> _fetchWeatherByLocation() async {
+    setState(() {
+      _isLoading = true;
+    });
+    final data = await _weatherService.fetchWeatherByLocation();
+    if (mounted) {
+      setState(() {
+        if (data != null) {
+          _weatherData = data;
+        } else {
+          _fetchWeather('Istanbul');
+          return;
+        }
+        _isLoading = false;
+      });
+    }
   }
 
   @override
